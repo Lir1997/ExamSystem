@@ -1,0 +1,1309 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>考试监考台</title>
+  <style>
+    :root {
+      --bg: #f3efe7;
+      --panel: #fffdf8;
+      --ink: #22201c;
+      --muted: #6b6458;
+      --line: #ddd3c5;
+      --accent: #b94f2d;
+      --accent-strong: #963714;
+      --soft: #efe1d2;
+      --ok: #1c7b54;
+      --warn: #9d6a12;
+      --idle: #7b756a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(185, 79, 45, 0.16), transparent 28%),
+        linear-gradient(180deg, #faf6ef 0%, var(--bg) 100%);
+      min-height: 100vh;
+    }
+
+    .shell {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px 20px 40px;
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: flex-start;
+      margin-bottom: 22px;
+    }
+
+    .hero h1 {
+      margin: 6px 0 10px;
+      font-size: 32px;
+      line-height: 1.15;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(185, 79, 45, 0.12);
+      color: var(--accent-strong);
+      font-size: 13px;
+      letter-spacing: .04em;
+    }
+
+    .summary {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 640px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+      align-items: flex-start;
+    }
+
+    .toolbar-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .toolbar label {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 13px;
+      min-width: 140px;
+    }
+
+    .toolbar input,
+    .toolbar select {
+      min-width: 140px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      font-size: 14px;
+    }
+
+    .toolbar .inline-check {
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      margin-top: 20px;
+      color: var(--ink);
+    }
+
+    .toolbar .inline-check input {
+      min-width: 0;
+      width: 16px;
+      height: 16px;
+      padding: 0;
+    }
+
+    .toolbar .hint {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+      margin-top: 2px;
+    }
+
+    .panel,
+    .login-panel {
+      background: rgba(255, 253, 248, 0.92);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: 0 18px 60px rgba(54, 42, 26, 0.08);
+      backdrop-filter: blur(10px);
+    }
+
+    .login-wrap {
+      min-height: calc(100vh - 80px);
+      display: grid;
+      place-items: center;
+    }
+
+    .login-panel {
+      width: min(520px, 100%);
+      padding: 28px;
+    }
+
+    .panel {
+      padding: 20px;
+    }
+
+    .login-panel h2,
+    .panel h2,
+    .panel h3 {
+      margin: 0 0 12px;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .field input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #fff;
+      font-size: 15px;
+      color: var(--ink);
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 11px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: transform .15s ease, opacity .15s ease, background .15s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    button.primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    button.primary:hover {
+      background: var(--accent-strong);
+    }
+
+    button.secondary {
+      background: var(--soft);
+      color: var(--ink);
+    }
+
+    button.ghost {
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--ink);
+    }
+
+    .message {
+      min-height: 22px;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .message.error {
+      color: #b42318;
+    }
+
+    .message.success {
+      color: var(--ok);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .stat {
+      padding: 16px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(245,239,229,0.96));
+      border: 1px solid var(--line);
+    }
+
+    .stat .label {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .stat strong {
+      font-size: 28px;
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .meta-item {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+    }
+
+    .meta-item span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 18px;
+      overflow: hidden;
+    }
+
+    th,
+    td {
+      padding: 14px 12px;
+      border-bottom: 1px solid #eee4d7;
+      text-align: left;
+      font-size: 14px;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      background: #fcf8f2;
+      font-weight: 600;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-not_started {
+      background: #f1eee8;
+      color: var(--idle);
+    }
+
+    .status-in_progress {
+      background: #e4f4ed;
+      color: var(--ok);
+    }
+
+    .status-submitted {
+      background: #eaf0ff;
+      color: #2953a6;
+    }
+
+    .status-timeout_submitted {
+      background: #fff0d8;
+      color: var(--warn);
+    }
+
+    .subtle {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .stats,
+      .meta {
+        grid-template-columns: 1fr;
+        display: grid;
+      }
+
+      .hero-actions {
+        margin-top: 8px;
+      }
+
+      .toolbar {
+        flex-direction: column;
+      }
+
+      table,
+      thead,
+      tbody,
+      th,
+      td,
+      tr {
+        display: block;
+      }
+
+      thead {
+        display: none;
+      }
+
+      tr {
+        margin-bottom: 12px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+        background: #fff;
+      }
+
+      td {
+        border-bottom: 1px solid #eee4d7;
+      }
+
+      td:last-child {
+        border-bottom: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="loginView" class="login-wrap">
+    <div class="login-panel">
+      <div class="eyebrow">监考入口</div>
+      <h2>登录考试监考台</h2>
+      <p class="summary">请输入本场考试的监考信息后进入监考页面。若通过专属监考链接进入，只需输入监考密码；若从通用监考入口进入，还需输入 6 位考试代码。考试代码和监考密码均不区分大小写，页面会统一按大写显示。</p>
+      <div class="field" id="examCodeField">
+        <label for="examCodeInput">考试代码</label>
+        <input id="examCodeInput" type="text" placeholder="请输入 6 位考试代码">
+      </div>
+      <div class="field">
+        <label for="passwordInput">监考密码</label>
+        <input id="passwordInput" type="password" placeholder="请输入 6 位监考密码">
+      </div>
+      <div class="actions">
+        <button class="primary" id="loginButton">进入监考台</button>
+      </div>
+      <div id="loginMessage" class="message"></div>
+    </div>
+  </div>
+
+  <div id="appView" class="hidden">
+    <div class="shell">
+      <div class="hero">
+        <div>
+          <div class="eyebrow">考试监考</div>
+          <h1 id="examTitle">考试监考台</h1>
+          <p class="summary">这里可以查看本场考试的考生名单、作答状态、最近保存时间和异常记录，并按需进行加时、收卷等监考操作。</p>
+        </div>
+        <div class="hero-actions">
+          <button class="secondary" id="refreshButton">刷新信息</button>
+          <button class="ghost" id="logoutButton">退出监考</button>
+        </div>
+      </div>
+
+      <div class="stats" id="statsPanel"></div>
+
+      <div class="meta" id="metaPanel"></div>
+
+      <div class="panel">
+        <h3>最近异常与处理记录</h3>
+        <p class="subtle">记录考生异常切屏、退出全屏、监考操作以及系统自动处理结果。</p>
+        <div id="recentLogsPanel" class="log-list"></div>
+      </div>
+
+      <div class="panel">
+        <h3>考生状态列表</h3>
+        <p class="subtle">当前列表仅展示已分配到本场考试且状态有效的考生，便于统一查看考试进度与处理情况。</p>
+        <div class="toolbar">
+          <div class="toolbar-group">
+            <label>
+              状态筛选
+              <select id="statusFilter">
+                <option value="all">全部状态</option>
+                <option value="not_started">未开始</option>
+                <option value="in_progress">作答中</option>
+                <option value="submitted">已交卷</option>
+                <option value="timeout_submitted">超时交卷</option>
+              </select>
+            </label>
+            <label>
+              搜索考生
+              <input id="keywordInput" type="text" placeholder="姓名 / 账号 / 学号">
+            </label>
+            <label class="inline-check">
+              <input id="onlyActionableCheckbox" type="checkbox">
+              <span>只看可操作考生</span>
+            </label>
+            <label class="inline-check">
+              <input id="autoRefreshCheckbox" type="checkbox" checked>
+              <span>自动刷新</span>
+            </label>
+            <div class="hint" id="autoRefreshHint">每 30 秒自动刷新一次监考信息</div>
+          </div>
+          <div class="toolbar-group">
+            <button class="secondary" id="selectAllButton">全选当前可操作考生</button>
+            <button class="secondary" id="bulkExtendButton">批量加时</button>
+            <button class="ghost" id="clearSelectionButton">清空选择</button>
+            <button class="primary" id="bulkForceSubmitButton">批量强制收卷</button>
+          </div>
+        </div>
+        <div class="message" id="appMessage"></div>
+        <table>
+          <thead>
+            <tr>
+              <th>选择</th>
+              <th>考生</th>
+              <th>考试状态</th>
+              <th>作答次数</th>
+              <th>异常</th>
+              <th>开始时间</th>
+              <th>当前截止</th>
+              <th>最后保存</th>
+              <th>交卷时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="studentTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const API_BASE = '/api/monitor'
+      const LEGACY_TOKEN_KEY = 'exam_monitor_token'
+      const TOKEN_KEY_PREFIX = 'exam_monitor_token:'
+      const params = new URLSearchParams(window.location.search)
+      const codeMatch = window.location.pathname.match(/\/monitor\/([^/?#]+)/i)
+      const examCodeFromPath = codeMatch ? decodeURIComponent(codeMatch[1]).toUpperCase() : ''
+
+      const loginView = document.getElementById('loginView')
+      const appView = document.getElementById('appView')
+      const examCodeField = document.getElementById('examCodeField')
+      const examCodeInput = document.getElementById('examCodeInput')
+      const passwordInput = document.getElementById('passwordInput')
+      const loginButton = document.getElementById('loginButton')
+      const loginMessage = document.getElementById('loginMessage')
+      const refreshButton = document.getElementById('refreshButton')
+      const logoutButton = document.getElementById('logoutButton')
+      const examTitle = document.getElementById('examTitle')
+      const statsPanel = document.getElementById('statsPanel')
+      const metaPanel = document.getElementById('metaPanel')
+      const recentLogsPanel = document.getElementById('recentLogsPanel')
+      const studentTableBody = document.getElementById('studentTableBody')
+      const appMessage = document.getElementById('appMessage')
+      const statusFilter = document.getElementById('statusFilter')
+      const keywordInput = document.getElementById('keywordInput')
+      const onlyActionableCheckbox = document.getElementById('onlyActionableCheckbox')
+      const autoRefreshCheckbox = document.getElementById('autoRefreshCheckbox')
+      const autoRefreshHint = document.getElementById('autoRefreshHint')
+      const selectAllButton = document.getElementById('selectAllButton')
+      const bulkExtendButton = document.getElementById('bulkExtendButton')
+      const clearSelectionButton = document.getElementById('clearSelectionButton')
+      const bulkForceSubmitButton = document.getElementById('bulkForceSubmitButton')
+      const HEARTBEAT_INTERVAL_MS = 5 * 60 * 1000
+      const AUTO_REFRESH_INTERVAL_MS = 30 * 1000
+      let heartbeatTimer = null
+      let autoRefreshTimer = null
+      let isRefreshing = false
+      let operationDepth = 0
+      let currentExamCode = examCodeFromPath
+      let studentItems = []
+      const selectedStudentIds = new Set()
+
+      if (examCodeFromPath) {
+        examCodeField.classList.add('hidden')
+      }
+
+      function normalizeExamCode(value) {
+        return String(value || '').trim().toUpperCase()
+      }
+
+      function tokenStorageKey(examCode) {
+        return TOKEN_KEY_PREFIX + normalizeExamCode(examCode)
+      }
+
+      function getTokenScope() {
+        return normalizeExamCode(currentExamCode || examCodeFromPath)
+      }
+
+      function buildMonitorPath(examCode) {
+        return '/monitor/' + encodeURIComponent(normalizeExamCode(examCode))
+      }
+
+      function syncMonitorPath(examCode) {
+        const normalizedExamCode = normalizeExamCode(examCode)
+        if (!normalizedExamCode) {
+          return
+        }
+
+        const nextPath = buildMonitorPath(normalizedExamCode)
+        const nextQuery = params.toString()
+        const nextUrl = nextPath + (nextQuery ? '?' + nextQuery : '')
+        const currentUrl = window.location.pathname + window.location.search
+
+        if (currentUrl !== nextUrl) {
+          window.history.replaceState({}, '', nextUrl)
+        }
+      }
+
+      function getToken() {
+        const scope = getTokenScope()
+        return scope ? (localStorage.getItem(tokenStorageKey(scope)) || '') : ''
+      }
+
+      function setToken(value, examCode) {
+        const scope = normalizeExamCode(examCode || getTokenScope())
+        localStorage.removeItem(LEGACY_TOKEN_KEY)
+
+        if (scope) {
+          currentExamCode = scope
+        }
+
+        if (value && scope) {
+          localStorage.setItem(tokenStorageKey(scope), value)
+          startHeartbeat()
+          startAutoRefresh()
+        } else {
+          if (scope) {
+            localStorage.removeItem(tokenStorageKey(scope))
+          }
+          stopHeartbeat()
+          stopAutoRefresh()
+        }
+      }
+
+      function stopHeartbeat() {
+        if (heartbeatTimer !== null) {
+          window.clearInterval(heartbeatTimer)
+          heartbeatTimer = null
+        }
+      }
+
+      function stopAutoRefresh() {
+        if (autoRefreshTimer !== null) {
+          window.clearInterval(autoRefreshTimer)
+          autoRefreshTimer = null
+        }
+      }
+
+      function startHeartbeat() {
+        stopHeartbeat()
+
+        if (!getToken()) {
+          return
+        }
+
+        heartbeatTimer = window.setInterval(function () {
+          void loadProfile(true)
+        }, HEARTBEAT_INTERVAL_MS)
+      }
+
+      function updateAutoRefreshHint() {
+        autoRefreshHint.textContent = autoRefreshCheckbox.checked
+          ? '每 30 秒自动刷新一次监考信息'
+          : '自动刷新已关闭，请按需手动刷新'
+      }
+
+      function startAutoRefresh() {
+        stopAutoRefresh()
+        updateAutoRefreshHint()
+
+        if (!getToken() || !autoRefreshCheckbox.checked || operationDepth > 0) {
+          return
+        }
+
+        autoRefreshTimer = window.setInterval(function () {
+          void loadProfile(true)
+        }, AUTO_REFRESH_INTERVAL_MS)
+      }
+
+      function ensureSessionTimers() {
+        if (!getToken()) {
+          stopHeartbeat()
+          stopAutoRefresh()
+          return
+        }
+
+        startHeartbeat()
+        startAutoRefresh()
+      }
+
+      function beginOperation() {
+        operationDepth += 1
+        stopAutoRefresh()
+      }
+
+      function endOperation() {
+        operationDepth = Math.max(operationDepth - 1, 0)
+        if (operationDepth === 0) {
+          startAutoRefresh()
+        }
+      }
+
+      function setMessage(target, text, type) {
+        target.textContent = text || ''
+        target.className = 'message' + (type ? ' ' + type : '')
+      }
+
+      function escapeHtml(text) {
+        return String(text ?? '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;')
+      }
+
+      async function api(path, init) {
+        const token = getToken()
+        const response = await fetch(API_BASE + path, {
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: 'Bearer ' + token } : {}),
+          },
+          ...init,
+        })
+
+        let payload
+        try {
+          payload = await response.json()
+        } catch {
+          throw new Error('请求失败')
+        }
+
+        if (!response.ok || payload.code !== 0) {
+          throw new Error(payload.message || '请求失败')
+        }
+
+        return payload.data
+      }
+
+      function showLogin() {
+        loginView.classList.remove('hidden')
+        appView.classList.add('hidden')
+      }
+
+      function showApp() {
+        loginView.classList.add('hidden')
+        appView.classList.remove('hidden')
+      }
+
+      function renderStats(counts) {
+        const items = [
+          ['总人数', counts.total || 0],
+          ['未开始', counts.not_started || 0],
+          ['作答中', counts.in_progress || 0],
+          ['正常交卷', counts.submitted || 0],
+          ['超时交卷', counts.timeout_submitted || 0],
+          ['有异常记录', counts.violations || 0],
+        ]
+
+        statsPanel.innerHTML = items.map(function (item) {
+          return '<div class="stat"><span class="label">' + escapeHtml(item[0]) + '</span><strong>' + escapeHtml(item[1]) + '</strong></div>'
+        }).join('')
+      }
+
+      function renderMeta(exam) {
+        const items = [
+          ['考试代码', exam.exam_code || '-'],
+          ['开始时间', exam.started_at || '-'],
+          ['结束时间', exam.ended_at || '-'],
+          ['自动全屏', Number(exam.auto_fullscreen || 0) === 1 ? '开启' : '关闭'],
+          ['切屏管控', Number(exam.enable_focus_monitor || 0) === 1 ? '开启' : '关闭'],
+          ['异常处理', focusActionLabel(exam.focus_loss_action, 0) + (Number(exam.focus_loss_limit || 0) > 0 ? ' / ' + Number(exam.focus_loss_limit || 0) + ' 次' : '')],
+        ]
+
+        metaPanel.innerHTML = items.map(function (item) {
+          return '<div class="meta-item"><span>' + escapeHtml(item[0]) + '</span><strong>' + escapeHtml(item[1]) + '</strong></div>'
+        }).join('')
+      }
+
+      function statusLabel(status) {
+        switch (status) {
+          case 'in_progress':
+            return '作答中'
+          case 'submitted':
+            return '已交卷'
+          case 'timeout_submitted':
+            return '超时交卷'
+          default:
+            return '未开始'
+        }
+      }
+
+      function focusActionLabel(action, deductScore) {
+        if (action === 'deduct_score') {
+          return '扣分' + (deductScore > 0 ? ' ' + deductScore : '')
+        }
+
+        if (action === 'zero_score') {
+          return '记零分'
+        }
+
+        if (action === 'force_submit') {
+          return '强制收卷'
+        }
+
+        return '不处理'
+      }
+
+      function violationSummary(item) {
+        const count = Number(item.focus_loss_count || 0)
+        const penaltyScore = Number(item.penalty_score || 0)
+        const forceZeroScore = Number(item.force_zero_score || 0)
+
+        if (forceZeroScore === 1) {
+          return '已记零分 / ' + count + ' 次'
+        }
+
+        if (penaltyScore > 0) {
+          return '扣分 ' + penaltyScore + ' / ' + count + ' 次'
+        }
+
+        if (count > 0) {
+          return '异常 ' + count + ' 次'
+        }
+
+        return '无'
+      }
+
+      function renderRecentLogs(logs) {
+        if (!Array.isArray(logs) || !logs.length) {
+          recentLogsPanel.innerHTML = '<div class="subtle">当前暂无异常或处理记录。</div>'
+          return
+        }
+
+        recentLogsPanel.innerHTML = logs.map(function (log) {
+          const studentText = log.student_name
+            ? escapeHtml(log.student_name) + ' / ' + escapeHtml(log.student_no || log.student_username || '-')
+            : '系统'
+
+          return [
+            '<div class="log-item">',
+            '<div><strong>' + escapeHtml(log.log_type_label || log.log_type || '-') + '</strong> <span class="subtle">/ ' + escapeHtml(log.source_label || log.source || '-') + '</span></div>',
+            '<div class="subtle">' + escapeHtml(log.created_at || '-') + ' / ' + studentText + '</div>',
+            '<div class="subtle">' + escapeHtml(log.note || '无备注') + '</div>',
+            '</div>',
+          ].join('')
+        }).join('')
+      }
+
+      function isActionable(item) {
+        return item.status === 'in_progress'
+      }
+
+      function normalizeKeyword(value) {
+        return String(value || '').trim().toUpperCase()
+      }
+
+      function filteredStudents() {
+        const status = statusFilter.value || 'all'
+        const keyword = normalizeKeyword(keywordInput.value)
+        const onlyActionable = Boolean(onlyActionableCheckbox.checked)
+
+        return studentItems.filter(function (item) {
+          if (status !== 'all' && item.status !== status) {
+            return false
+          }
+
+          if (onlyActionable && !isActionable(item)) {
+            return false
+          }
+
+          if (!keyword) {
+            return true
+          }
+
+          const haystacks = [
+            item.name,
+            item.username,
+            item.student_no,
+          ]
+
+          return haystacks.some(function (value) {
+            return normalizeKeyword(value).includes(keyword)
+          })
+        })
+      }
+
+      function renderStudents(items) {
+        if (!items.length) {
+          studentTableBody.innerHTML = '<tr><td colspan="10">当前筛选条件下暂无考生。</td></tr>'
+          return
+        }
+
+        studentTableBody.innerHTML = items.map(function (item) {
+          const actionHtml = item.status === 'in_progress'
+            ? '<div class="row-actions"><button class="secondary" data-action="extend" data-student-id="' + escapeHtml(item.id) + '">临时加时</button><button class="ghost" data-action="force-submit" data-student-id="' + escapeHtml(item.id) + '">强制收卷</button></div>'
+            : '<span class="subtle">当前无需处理</span>'
+          const checked = selectedStudentIds.has(item.id) ? ' checked' : ''
+
+          return [
+            '<tr>',
+            '<td><input type="checkbox" data-action="toggle-select" data-student-id="' + escapeHtml(item.id) + '"' + checked + '></td>',
+            '<td><strong>' + escapeHtml(item.name) + '</strong><div class="subtle">账号：' + escapeHtml(item.username) + '</div><div class="subtle">学号：' + escapeHtml(item.student_no) + '</div></td>',
+            '<td><span class="status-badge status-' + escapeHtml(item.status) + '">' + escapeHtml(statusLabel(item.status)) + '</span></td>',
+            '<td>' + escapeHtml(item.attempt_no || 0) + '</td>',
+            '<td>' + escapeHtml(violationSummary(item)) + '</td>',
+            '<td>' + escapeHtml(item.started_at || '-') + '</td>',
+            '<td>' + escapeHtml(item.deadline_at || '-') + '</td>',
+            '<td>' + escapeHtml(item.last_saved_at || '-') + '</td>',
+            '<td>' + escapeHtml(item.submitted_at || '-') + '</td>',
+            '<td>' + actionHtml + '</td>',
+            '</tr>',
+          ].join('')
+        }).join('')
+      }
+
+      function renderStudentTable() {
+        renderStudents(filteredStudents())
+      }
+
+      function currentSelectionIds() {
+        return filteredStudents()
+          .map(function (item) { return item.id })
+          .filter(function (id) { return selectedStudentIds.has(id) })
+      }
+
+      function selectableStudents() {
+        return filteredStudents().filter(function (item) {
+          return isActionable(item)
+        })
+      }
+
+      function areAllSelectableStudentsSelected() {
+        const items = selectableStudents()
+        return items.length > 0 && items.every(function (item) {
+          return selectedStudentIds.has(item.id)
+        })
+      }
+
+      async function loadProfile(silent) {
+        if (isRefreshing) {
+          return
+        }
+
+        isRefreshing = true
+
+        try {
+          const data = await api('/auth/profile')
+          const profileExamCode = normalizeExamCode(data && data.exam ? data.exam.exam_code : '')
+          if (examCodeFromPath && profileExamCode && profileExamCode !== examCodeFromPath) {
+            setToken('', getTokenScope())
+            throw new Error('当前监考链接与登录考试不一致，请重新登录。')
+          }
+          if (profileExamCode) {
+            currentExamCode = profileExamCode
+            syncMonitorPath(profileExamCode)
+          }
+          examTitle.textContent = data.exam.title || '考试监考台'
+          renderStats(data.counts || {})
+          renderMeta(data.exam || {})
+          studentItems = Array.isArray(data.students) ? data.students : []
+          renderRecentLogs(Array.isArray(data.recent_logs) ? data.recent_logs : [])
+          renderStudentTable()
+          if (!silent) {
+            setMessage(appMessage, '监考信息已同步。', 'success')
+          }
+          showApp()
+        } catch (error) {
+          setToken('')
+          setMessage(loginMessage, error instanceof Error ? error.message : '登录已失效，请重新输入监考信息。', 'error')
+          showLogin()
+        } finally {
+          isRefreshing = false
+        }
+      }
+
+      async function doLogin() {
+        setMessage(loginMessage, '', '')
+
+        try {
+          const payload = {
+            password: passwordInput.value.trim().toUpperCase(),
+          }
+
+          payload.exam_code = examCodeFromPath || examCodeInput.value.trim().toUpperCase()
+
+          const data = await api('/auth/login', {
+            method: 'POST',
+            body: JSON.stringify(payload),
+          })
+
+          const loggedInExamCode = normalizeExamCode((data.exam && data.exam.exam_code) || payload.exam_code)
+          setToken(data.token, loggedInExamCode)
+          syncMonitorPath(loggedInExamCode)
+          passwordInput.value = ''
+          setMessage(loginMessage, '登录成功，正在进入监考台。', 'success')
+          await loadProfile()
+        } catch (error) {
+          setMessage(loginMessage, error instanceof Error ? error.message : '登录失败', 'error')
+        }
+      }
+
+      async function bridgeLogin() {
+        const bridge = params.get('bridge')
+        if (!bridge) {
+          return false
+        }
+
+        try {
+          const response = await fetch(API_BASE + '/auth/bridge?bridge=' + encodeURIComponent(bridge))
+          const payload = await response.json()
+          if (!response.ok || payload.code !== 0) {
+            throw new Error(payload.message || '自动进入监考台失败')
+          }
+
+          const bridgedExamCode = normalizeExamCode(payload.data && payload.data.exam ? payload.data.exam.exam_code : '')
+          setToken(payload.data.token, bridgedExamCode)
+          params.delete('bridge')
+          syncMonitorPath(bridgedExamCode)
+          await loadProfile()
+          return true
+        } catch (error) {
+          setMessage(loginMessage, error instanceof Error ? error.message : '自动进入监考台失败', 'error')
+          return false
+        }
+      }
+
+      async function extendTime(studentId) {
+        const value = window.prompt('请输入加时时长（分钟）', '10')
+        if (value === null) {
+          return
+        }
+
+        const extendMinutes = Number.parseInt(value, 10)
+        if (!Number.isFinite(extendMinutes) || extendMinutes <= 0) {
+          setMessage(appMessage, '请输入大于 0 的加时时长。', 'error')
+          return
+        }
+
+        beginOperation()
+
+        try {
+          setMessage(appMessage, '正在为考生加时...', '')
+          await api('/operations/extend-time', {
+            method: 'POST',
+            body: JSON.stringify({
+              student_id: studentId,
+              extend_minutes: extendMinutes,
+            }),
+          })
+          setMessage(appMessage, '加时已生效。', 'success')
+          await loadProfile(true)
+        } catch (error) {
+          setMessage(appMessage, error instanceof Error ? error.message : '加时处理失败', 'error')
+        } finally {
+          endOperation()
+        }
+      }
+
+      async function forceSubmit(studentId) {
+        if (!window.confirm('确认立即为该考生收卷吗？')) {
+          return
+        }
+
+        beginOperation()
+
+        try {
+          setMessage(appMessage, '正在执行收卷...', '')
+          await api('/operations/force-submit', {
+            method: 'POST',
+            body: JSON.stringify({
+              student_id: studentId,
+            }),
+          })
+          setMessage(appMessage, '收卷已完成。', 'success')
+          await loadProfile(true)
+        } catch (error) {
+          setMessage(appMessage, error instanceof Error ? error.message : '收卷失败', 'error')
+        } finally {
+          endOperation()
+        }
+      }
+
+      async function bulkForceSubmit() {
+        const studentIds = currentSelectionIds()
+        if (!studentIds.length) {
+          setMessage(appMessage, '请先勾选需要收卷的考生。', 'error')
+          return
+        }
+
+        if (!window.confirm('确认立即为当前选中的 ' + studentIds.length + ' 名考生收卷吗？')) {
+          return
+        }
+
+        beginOperation()
+
+        try {
+          setMessage(appMessage, '正在批量收卷...', '')
+          const result = await api('/operations/bulk-force-submit', {
+            method: 'POST',
+            body: JSON.stringify({
+              student_ids: studentIds,
+            }),
+          })
+
+          studentIds.forEach(function (id) {
+            selectedStudentIds.delete(id)
+          })
+
+          const submittedCount = Number(result.submitted_count || 0)
+          const skippedCount = Number(result.skipped_count || 0)
+          const message = skippedCount > 0
+            ? '批量收卷完成，已处理 ' + submittedCount + ' 人，跳过 ' + skippedCount + ' 人。'
+            : '批量收卷完成，共处理 ' + submittedCount + ' 人。'
+
+          setMessage(appMessage, message, 'success')
+          await loadProfile(true)
+        } catch (error) {
+          setMessage(appMessage, error instanceof Error ? error.message : '批量收卷失败', 'error')
+        } finally {
+          endOperation()
+        }
+      }
+
+      async function bulkExtendTime() {
+        const studentIds = currentSelectionIds()
+        if (!studentIds.length) {
+          setMessage(appMessage, '请先勾选需要加时的考生。', 'error')
+          return
+        }
+
+        const value = window.prompt('请输入统一加时时长（分钟）', '10')
+        if (value === null) {
+          return
+        }
+
+        const extendMinutes = Number.parseInt(value, 10)
+        if (!Number.isFinite(extendMinutes) || extendMinutes <= 0) {
+          setMessage(appMessage, '请输入大于 0 的加时时长。', 'error')
+          return
+        }
+
+        beginOperation()
+
+        try {
+          setMessage(appMessage, '正在批量加时...', '')
+          const result = await api('/operations/bulk-extend-time', {
+            method: 'POST',
+            body: JSON.stringify({
+              student_ids: studentIds,
+              extend_minutes: extendMinutes,
+            }),
+          })
+
+          const extendedCount = Number(result.extended_count || 0)
+          const skippedCount = Number(result.skipped_count || 0)
+          const message = skippedCount > 0
+            ? '批量加时完成，已处理 ' + extendedCount + ' 人，跳过 ' + skippedCount + ' 人。'
+            : '批量加时完成，共处理 ' + extendedCount + ' 人。'
+
+          setMessage(appMessage, message, 'success')
+          await loadProfile(true)
+        } catch (error) {
+          setMessage(appMessage, error instanceof Error ? error.message : '批量加时处理失败', 'error')
+        } finally {
+          endOperation()
+        }
+      }
+
+      loginButton.addEventListener('click', function () {
+        void doLogin()
+      })
+
+      passwordInput.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+          void doLogin()
+        }
+      })
+
+      refreshButton.addEventListener('click', function () {
+        void loadProfile()
+      })
+
+      logoutButton.addEventListener('click', function () {
+        setToken('')
+        studentItems = []
+        selectedStudentIds.clear()
+        setMessage(appMessage, '', '')
+        showLogin()
+      })
+
+      statusFilter.addEventListener('change', function () {
+        renderStudentTable()
+      })
+
+      keywordInput.addEventListener('input', function () {
+        renderStudentTable()
+      })
+
+      onlyActionableCheckbox.addEventListener('change', function () {
+        renderStudentTable()
+      })
+
+      autoRefreshCheckbox.addEventListener('change', function () {
+        startAutoRefresh()
+      })
+
+      document.addEventListener('visibilitychange', function () {
+        if (!getToken()) {
+          return
+        }
+
+        if (document.hidden) {
+          stopAutoRefresh()
+          return
+        }
+
+        ensureSessionTimers()
+        void loadProfile(true)
+      })
+
+      window.addEventListener('focus', function () {
+        if (!getToken()) {
+          return
+        }
+
+        ensureSessionTimers()
+      })
+
+      selectAllButton.addEventListener('click', function () {
+        const items = selectableStudents()
+        if (!items.length) {
+          setMessage(appMessage, '当前筛选条件下没有可操作考生。', 'error')
+          return
+        }
+
+        const shouldClear = areAllSelectableStudentsSelected()
+
+        items.forEach(function (item) {
+          if (shouldClear) {
+            selectedStudentIds.delete(item.id)
+            return
+          }
+
+          selectedStudentIds.add(item.id)
+        })
+
+        setMessage(appMessage, shouldClear ? '已取消当前可操作考生的选择。' : '已选中当前可操作考生。', 'success')
+        renderStudentTable()
+      })
+
+      bulkExtendButton.addEventListener('click', function () {
+        void bulkExtendTime()
+      })
+
+      clearSelectionButton.addEventListener('click', function () {
+        selectedStudentIds.clear()
+        renderStudentTable()
+      })
+
+      bulkForceSubmitButton.addEventListener('click', function () {
+        void bulkForceSubmit()
+      })
+
+      studentTableBody.addEventListener('click', function (event) {
+        const target = event.target
+        if (!(target instanceof HTMLElement)) {
+          return
+        }
+
+        const action = target.getAttribute('data-action')
+        const studentId = Number.parseInt(target.getAttribute('data-student-id') || '0', 10)
+
+        if (!action || studentId <= 0) {
+          return
+        }
+
+        if (action === 'extend') {
+          void extendTime(studentId)
+          return
+        }
+
+        if (action === 'force-submit') {
+          void forceSubmit(studentId)
+        }
+      })
+
+      studentTableBody.addEventListener('change', function (event) {
+        const target = event.target
+        if (!(target instanceof HTMLInputElement)) {
+          return
+        }
+
+        const action = target.getAttribute('data-action')
+        const studentId = Number.parseInt(target.getAttribute('data-student-id') || '0', 10)
+
+        if (action !== 'toggle-select' || studentId <= 0) {
+          return
+        }
+
+        if (target.checked) {
+          selectedStudentIds.add(studentId)
+        } else {
+          selectedStudentIds.delete(studentId)
+        }
+      })
+
+      ;(async function init() {
+        updateAutoRefreshHint()
+
+        if (await bridgeLogin()) {
+          return
+        }
+
+        if (examCodeFromPath && getToken()) {
+          ensureSessionTimers()
+          await loadProfile()
+          return
+        }
+
+        showLogin()
+      })()
+    })()
+  </script>
+</body>
+</html>

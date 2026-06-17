@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS `exam_admin_audit_logs` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `admin_user_id` bigint unsigned DEFAULT NULL,
+  `admin_name` varchar(100) DEFAULT NULL,
+  `role_code` varchar(50) DEFAULT NULL,
+  `module` varchar(30) NOT NULL DEFAULT 'admin',
+  `action_key` varchar(120) NOT NULL,
+  `request_method` varchar(10) NOT NULL,
+  `request_path` varchar(255) NOT NULL,
+  `request_ip` varchar(45) DEFAULT NULL,
+  `request_params_json` longtext NULL,
+  `response_code` int NOT NULL DEFAULT 0,
+  `response_message` varchar(255) DEFAULT NULL,
+  `duration_ms` int NOT NULL DEFAULT 0,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_exam_admin_audit_logs_module_created_at` (`module`,`created_at`),
+  KEY `idx_exam_admin_audit_logs_admin_user_id_created_at` (`admin_user_id`,`created_at`),
+  KEY `idx_exam_admin_audit_logs_action_key_created_at` (`action_key`,`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
